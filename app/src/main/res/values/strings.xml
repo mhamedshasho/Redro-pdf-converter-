@@ -20,4 +20,8 @@
     <string name="analysis_no_text">No selectable text found on the first page.</string>
     <string name="open_failed">Could not analyze this PDF. It may be damaged, encrypted, or unsupported.</string>
     <string name="no_file_selected">No PDF was selected.</string>
+    <string name="export_visual_docx">Export visual Word (page images)</string>
+    <string name="visual_export_running">Rendering PDF pages and creating visual Word…</string>
+    <string name="visual_export_complete">Visual Word document created and saved.</string>
+    <string name="visual_export_failed">Visual Word export failed. The PDF may be too large or unsupported.</string>
 </resources>
