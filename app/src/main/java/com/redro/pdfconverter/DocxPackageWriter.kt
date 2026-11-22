@@ -32,13 +32,10 @@ object DocxPackageWriter {
         val pageHeight = pages.first().heightPoints.coerceAtLeast(1f)
         val maxWidth = 9_144_000L
         val maxHeight = 12_801_600L
-        val scale = minOf(maxWidth.toDouble() / pageWidth, maxHeight.toDouble() / pageHeight)
-        val imageWidth = (pageWidth * scale).toLong().coerceAtLeast(1L)
-        val imageHeight = (pageHeight * scale).toLong().coerceAtLeast(1L)
         ZipOutputStream(BufferedOutputStream(output)).use { zip ->
             addEntry(zip, "[Content_Types].xml", visualContentTypesXml())
             addEntry(zip, "_rels/.rels", packageRelationshipsXml())
-            addEntry(zip, "word/document.xml", visualDocumentXml(pages, imageWidth, imageHeight, pageWidth, pageHeight))
+            addEntry(zip, "word/document.xml", visualDocumentXml(pages, maxWidth, maxHeight, pageWidth, pageHeight))
             addEntry(zip, "word/_rels/document.xml.rels", visualRelationshipsXml(pages.size))
             pages.forEachIndexed { index, page ->
                 zip.putNextEntry(ZipEntry("word/media/page-${index + 1}.png"))
@@ -50,8 +47,8 @@ object DocxPackageWriter {
 
     private fun visualDocumentXml(
         pages: List<VisualPageImage>,
-        imageWidth: Long,
-        imageHeight: Long,
+        maxWidth: Long,
+        maxHeight: Long,
         pageWidth: Float,
         pageHeight: Float
     ): String {
@@ -59,11 +56,14 @@ object DocxPackageWriter {
         val pageHeightTwips = (pageHeight * 20f).toInt().coerceAtLeast(1)
         val body = buildString {
             pages.forEachIndexed { index, page ->
+                val scale = minOf(maxWidth.toDouble() / page.widthPoints.coerceAtLeast(1f), maxHeight.toDouble() / page.heightPoints.coerceAtLeast(1f))
+                val imageWidth = (page.widthPoints * scale).toLong().coerceAtLeast(1L)
+                val imageHeight = (page.heightPoints * scale).toLong().coerceAtLeast(1L)
                 if (index > 0) append("<w:p><w:r><w:br w:type=\\"page\\"/></w:r></w:p>")
                 append("<w:p><w:pPr><w:jc w:val=\\"center\\"/></w:pPr><w:r><w:drawing>")
                 append("<wp:inline distT=\\"0\\" distB=\\"0\\" distL=\\"0\\" distR=\\"0\\">")
                 append("<wp:extent cx=\\"$imageWidth\\" cy=\\"$imageHeight\\"/>")
-                append("<wp:docPr id=\\" ${index + 1}\\" name=\\"PDF page ${page.pageNumber}\\"/>")
+                append("<wp:docPr id=\\"${index + 1}\\" name=\\"PDF page ${page.pageNumber}\\"/>")
                 append("<a:graphic xmlns:a=\\"http://schemas.openxmlformats.org/drawingml/2006/main\\">")
                 append("<a:graphicData uri=\\"http://schemas.openxmlformats.org/drawingml/2006/picture\\">")
                 append("<pic:pic xmlns:pic=\\"http://schemas.openxmlformats.org/drawingml/2006/picture\\">")
