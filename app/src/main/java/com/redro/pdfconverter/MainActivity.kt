@@ -176,7 +176,7 @@ class MainActivity : Activity() {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     latestAnalysis = result
                     chooseButton.isEnabled = true
-                    exportButton.visibility = if (result.pages.any { it.text.isNotBlank() }) View.VISIBLE else View.GONE
+                    exportButton.visibility = View.VISIBLE
                     visualExportButton.visibility = View.VISIBLE
                     ocrDownloadButton.visibility = if (result.pages.any { it.text.isBlank() } && !OcrLanguageModelManager.isReady(applicationContext)) View.VISIBLE else View.GONE
                     val output = StringBuilder()
