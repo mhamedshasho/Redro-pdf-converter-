@@ -1,29 +1,41 @@
 # Redro PDF Converter
 
-Native Android PDF-to-Word application focused on high-fidelity, fully on-device conversion.
+Native Android PDF-to-Word converter with editable-text and visual-page output modes.
 
-## Approved product decisions
+## Product decisions
 
 - Platform: Android.
-- Processing: fully offline; PDF contents are never uploaded.
-- Conversion modes: editable DOCX and visual-preservation DOCX.
-- Quality priority: maximum practical fidelity, with explicit reporting when an element cannot be reconstructed.
-- Languages: Arabic and English, including mixed RTL/LTR documents.
+- Conversion: editable DOCX and visual-preservation DOCX.
+- Priority: maximum practical fidelity.
+- Languages: Arabic and English, including mixed RTL/LTR text.
+- PDF parsing, page rendering, OCR recognition, and DOCX generation run on-device.
+- Internet is used only when the user explicitly downloads the optional Arabic and English OCR language models. PDF documents are never uploaded.
 
-## Current implementation status
+## Implemented
 
-The `android-foundation` branch contains the first native Android application foundation:
-- Kotlin Android application configuration.
-- Arabic and English string resources.
-- Local PDF selection through Android Storage Access Framework.
-- Local PDF opening and page-count inspection through Android PdfRenderer.
-- A starter unit test and Android CI workflow.
+- Kotlin Android application with Arabic and English UI resources.
+- PDF selection through Android Storage Access Framework.
+- PDF page analysis and selectable-text extraction using PDFBox-Android.
+- Editable DOCX package generation with XML escaping, page breaks, and basic Arabic RTL properties.
+- Visual DOCX export: renders each PDF page to a PNG and embeds the page images in a Word document.
+- Optional Tesseract 5 OCR engine with user-triggered downloads of Arabic and English tessdata_fast models.
+- OCR is run locally on pages where no selectable text was extracted.
+- GitHub Actions unit tests, debug APK build, and APK artifact upload.
 
-This is not yet a PDF-to-Word converter. DOCX generation, text extraction, OCR, image/table reconstruction, and visual-page export remain planned implementation milestones. No APK is declared release-ready until CI and device acceptance tests pass.
+## Known limitations
 
-## Privacy
+- Editable export currently preserves extracted text and page breaks, not the exact source typography or page layout.
+- OCR currently targets pages with no selectable text. Mixed pages containing both selectable text and text embedded in images are not yet fully reconstructed.
+- Tables, independent image placement, charts, columns, equations, and semantic layout reconstruction are not implemented.
+- Visual export preserves page appearance as page-sized images, so its text is not independently editable.
+- Hybrid editable-plus-image reconstruction is not implemented.
+- Large PDFs may require substantial memory and processing time. Visual export currently renders pages in memory.
 
-The application manifest does not request Internet permission. Conversion is designed to run entirely on the device.
+Do not treat these limitations as successful conversion. The app provides separate editable and visual outputs so users can choose between editability and appearance.
+
+## OCR setup
+
+Choose a PDF. If it contains scanned pages, use Download Arabic + English OCR data once while connected to the Internet. The language models are stored in the app's private files directory. Subsequent OCR recognition runs locally; the PDF itself is not sent anywhere.
 
 ## Build
 
@@ -33,9 +45,12 @@ Requirements:
 - Gradle 8.13
 
 Run:
+
 ```bash
 gradle testDebugUnitTest
 gradle assembleDebug
 ```
+
+The Android CI workflow uploads the debug APK as a downloadable artifact after a successful build.
 
 See [Architecture](docs/ARCHITECTURE.md), [Implementation Plan](docs/IMPLEMENTATION_PLAN.md), and [Test Plan](docs/TEST_PLAN.md).
