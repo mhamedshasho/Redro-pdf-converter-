@@ -1,55 +1,91 @@
 # Implementation Plan
 
-## Product goal
-Create an Android application that converts a user-selected PDF into an editable DOCX file. The first release prioritizes dependable text extraction, usable Arabic/English reading order, local processing, and clear error reporting.
+## Product decisions
+
+- Android application written in Kotlin.
+- Fully offline processing; no network transfer of document contents.
+- Two required output modes: editable DOCX and visual-preservation DOCX.
+- Hybrid reconstruction is an optional internal strategy for difficult elements, not a replacement for the two user-facing modes.
+- Maximum practical fidelity is prioritized over conversion speed.
+- Arabic, English, and mixed RTL/LTR content are required.
 
 ## Milestones
 
 ### M0 — Requirements and test design
-- Confirm supported inputs, outputs, privacy boundary, and known limitations.
-- Define acceptance criteria and a repeatable test corpus.
-- Record architecture decisions before implementing the converter.
+- Completed planning baseline.
+- Define a redistributable PDF test corpus and explicit acceptance gates.
+- Keep known limitations visible; never silently drop content.
 
 ### M1 — Android foundation
-- Kotlin Android application and Gradle build.
-- Storage Access Framework document picker and destination picker.
-- Arabic/English UI, RTL layout, progress, cancellation, and error states.
-- No network permission and no upload endpoints.
+- Kotlin Android application and Gradle configuration.
+- Arabic and English resources.
+- Storage Access Framework PDF picker.
+- Open a selected PDF locally and inspect its page count.
+- No Internet permission or upload path.
+- Add CI build and unit-test workflow.
 
-### M2 — Conversion core
-- Open PDF locally and inspect page count and text availability.
-- Extract text page-by-page.
-- Preserve paragraph boundaries and basic line ordering.
-- Generate a valid DOCX package with Open XML parts.
-- Set RTL paragraph/run properties for Arabic text.
-- Keep conversion core independent from Android UI.
+### M2 — PDF analysis and extraction
+- Evaluate and integrate a maintained Android-compatible PDF parsing library.
+- Extract text, font metadata, images, page dimensions, and positioned text runs page-by-page.
+- Detect pages with no selectable text.
+- Preserve source coordinates and page boundaries.
+- Classify pages as text, image-only, or mixed.
+- Handle encrypted, malformed, and unsupported files with explicit errors.
 
-### M3 — Automated verification
-- Unit tests for text normalization, line grouping, RTL detection, and DOCX package structure.
-- Instrumentation tests for document selection and conversion flow.
-- Validate generated DOCX ZIP structure and required XML parts.
-- Verify malformed, encrypted, empty, and scanned-image PDFs fail safely.
+### M3 — DOCX foundation
+- Generate valid Office Open XML packages.
+- Write paragraphs, runs, page breaks, styles, relationships, and embedded media.
+- Preserve Unicode and XML escaping.
+- Implement RTL paragraph and run properties for Arabic.
+- Validate ZIP entries and XML before reporting success.
 
-### M4 — Device verification
-- Test on a physical Android phone.
-- Open generated DOCX in a compatible office application.
-- Compare Arabic and English sample outputs with source PDFs.
-- Check memory behavior on multi-page PDFs and cancellation behavior.
+### M4 — OCR
+- Integrate local OCR with bundled language data for Arabic and English.
+- Evaluate Tesseract and other on-device engines for accuracy, APK size, licensing, and device performance before selecting the production engine.
+- Preprocess scans: orientation, deskew, contrast, denoise, and resolution.
+- Preserve OCR bounding boxes and confidence values.
+- Do not replace extracted text with OCR unless the page or region requires it.
 
-### M5 — Release candidate
-- Fix defects found in the test corpus.
-- Configure app icon, versioning, signing strategy, and release workflow.
-- Produce an APK only after acceptance gates pass.
+### M5 — Layout and complex content
+- Detect columns, paragraphs, headings, lists, and reading order.
+- Detect and reconstruct tables with merged cells where reliably identified.
+- Extract and position images.
+- Preserve charts, diagrams, signatures, and unsupported visual elements as embedded images when semantic reconstruction is not reliable.
+- Evaluate mathematical OCR; retain a faithful image fallback for equations that cannot be reconstructed.
+- Add hybrid reconstruction for difficult regions.
 
-## First-release scope
-Included: PDF to DOCX, local/offline conversion, Arabic and English UI, PDF selection, DOCX destination selection, progress, useful errors, and basic text/paragraph reconstruction.
+### M6 — Output modes
+- Editable mode: editable paragraphs, tables, and independent images wherever possible.
+- Visual mode: render each PDF page at a selected high resolution and insert it as a page-sized image in DOCX.
+- Hybrid internal fallback: editable content plus image-backed regions for elements that cannot be reconstructed reliably.
+- Keep page order, page dimensions, and orientation.
 
-Not promised initially: pixel-perfect layout, OCR for scanned PDFs, complete reconstruction of tables/columns/forms/charts/images, or password bypass.
+### M7 — UX, performance, and accessibility
+- Preview and conversion settings.
+- Progress, cancellation, and recoverable errors.
+- Process pages incrementally to bound memory use.
+- Clean temporary files safely.
+- Explain OCR uncertainty and unsupported elements.
+
+### M8 — Release verification
+- Unit tests, package validation, Android build, instrumentation tests, and physical-device tests.
+- Inspect generated DOCX in compatible office applications.
+- Test airplane-mode operation.
+- Record actual CI and device results before publishing an APK.
 
 ## Release gates
-1. All unit tests pass.
-2. Android debug build succeeds in CI.
-3. Instrumentation tests pass on an Android emulator.
-4. Test corpus produces structurally valid DOCX files.
-5. Arabic and English output is manually inspected on a physical device.
-6. No unexplained crashes, data loss, or network transfer of document contents.
+
+1. All automated tests pass.
+2. Debug APK builds successfully in CI.
+3. Generated DOCX packages pass structural and XML validation.
+4. Arabic, English, and mixed-script outputs are manually inspected.
+5. Scanned PDF OCR is tested with a labelled corpus and measured accuracy.
+6. Large-file tests show bounded memory use and no unexplained crashes.
+7. Airplane-mode conversion succeeds after installation.
+8. No document contents are sent over the network.
+
+## Non-goals
+
+- Bypassing PDF passwords or access restrictions.
+- Claiming pixel-perfect editable reconstruction for every PDF.
+- Silently discarding elements that cannot be parsed.
