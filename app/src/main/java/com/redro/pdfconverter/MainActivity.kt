@@ -279,27 +279,41 @@ class MainActivity : Activity() {
 
     private fun saveDocx(uri: Uri) {
         val analysis = latestAnalysis ?: return
+        val sourceUri = latestPdfUri ?: return
+        if (analysis.pages.any { it.text.isBlank() } && !OcrLanguageModelManager.isReady(applicationContext)) {
+            ocrDownloadButton.visibility = View.VISIBLE
+            statusView.text = getString(R.string.ocr_required)
+            return
+        }
         exportButton.isEnabled = false
         statusView.text = getString(R.string.export_running)
 
         Thread {
             try {
+                val converted = if (analysis.pages.any { it.text.isBlank() }) {
+                    runOnUiThread {
+                        if (!isFinishing && !isDestroyed) statusView.text = getString(R.string.ocr_running)
+                    }
+                    PdfOcrProcessor(applicationContext).recognizeScannedPages(sourceUri, analysis)
+                } else {
+                    analysis
+                }
                 val output = contentResolver.openOutputStream(uri)
                     ?: throw IllegalStateException("Unable to create output document")
                 output.use { stream ->
-                    DocxPackageWriter.writeEditable(analysis, stream)
+                    DocxPackageWriter.writeEditable(converted, stream)
                 }
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     exportButton.isEnabled = true
-                    statusView.append("\n\n")
+                    statusView.append("\\n\\n")
                     statusView.append(getString(R.string.export_complete))
                 }
             } catch (_: Exception) {
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     exportButton.isEnabled = true
-                    statusView.append("\n\n")
+                    statusView.append("\\n\\n")
                     statusView.append(getString(R.string.export_failed))
                 }
             }
