@@ -11,56 +11,56 @@
 ## Milestone status
 
 ### M0 — Requirements and test design
-<badge>Completed planning baseline</badge>
+**Status: Completed planning baseline**
 - Product decisions and release gates documented.
 - Test corpus requirements defined.
 
 ### M1 — Android foundation
-<badge>Implemented</badge>
+**Status: Implemented**
 - Native Kotlin Android project and bilingual resources.
 - Storage Access Framework PDF selection and DOCX save.
 - CI unit tests, debug APK build, and artifact upload.
 
 ### M2 — PDF analysis and extraction
-<badge>Partially implemented</badge>
+**Status: Partially implemented**
 - PDFBox-Android document loading and page-by-page text extraction.
 - Page dimensions and document title extraction.
 - Text presence classification.
 - Still required: image XObject extraction, positioned text runs, font metadata, mixed-page classification, robust encrypted-file UX.
 
 ### M3 — DOCX foundation
-<badge>Partially implemented</badge>
+**Status: Partially implemented**
 - OOXML ZIP package generation.
 - Editable text paragraphs, page breaks, XML escaping, basic Arabic RTL properties.
 - Visual DOCX package with embedded page PNGs and relationships.
 - Still required: runtime package validation, styles, tables, independent images, and per-section page dimensions.
 
 ### M4 — OCR
-<badge>Initial implementation</badge>
+**Status: Initial implementation**
 - Tesseract4Android 5 engine.
 - User-triggered download of official Arabic and English tessdata_fast models.
 - Local OCR for pages without extracted selectable text.
 - Still required: real-device validation, labelled accuracy corpus, progress/cancellation, preprocessing, mixed-page OCR, and confidence reporting.
 
 ### M5 — Layout and complex content
-<badge>Not implemented</badge>
+**Status: Not implemented**
 - Columns, headings, lists, semantic tables, charts, diagrams, equations, and independent image placement.
 - Hybrid editable/image-backed reconstruction.
 
 ### M6 — Output modes
-<badge>Partially implemented</badge>
+**Status: Partially implemented**
 - Editable text DOCX.
 - Visual page-image DOCX preserving page order and aspect ratio.
 - Still required: full page-specific section sizing and hybrid reconstruction.
 
 ### M7 — UX, performance, and accessibility
-<badge>Partially implemented</badge>
+**Status: Partially implemented**
 - Background PDF analysis, OCR, and export.
 - Visual pages are spooled to temporary PNG files instead of retaining all rendered bitmaps in memory.
 - Still required: lifecycle-safe jobs, cancellation, bounded file-size handling, detailed progress, accessibility review, and temporary-file recovery.
 
 ### M8 — Release verification
-<badge>CI foundation implemented</badge>
+**Status: CI foundation implemented**
 - Unit tests and debug APK CI.
 - APK artifact upload after successful build.
 - Still required: latest CI confirmation after OCR/visual changes, physical Android device tests, airplane-mode OCR validation, and office-app inspection.
