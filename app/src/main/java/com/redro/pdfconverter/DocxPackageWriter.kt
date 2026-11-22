@@ -85,19 +85,19 @@ object DocxPackageWriter {
     }
 
     private fun visualRelationshipsXml(count: Int): String =
-        "<?xml version=\\"1.0\\" encoding=\\"UTF-8\\" standalone=\\"yes\\"?>" +
-            "<Relationships xmlns=\\"http://schemas.openxmlformats.org/package/2006/relationships\\">" +
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
+            "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">" +
             (1..count).joinToString("") { index ->
-                "<Relationship Id=\\"rId$index\\" Type=\\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/image\\" Target=\\"media/page-$index.png\\"/>"
+                "<Relationship Id=\"rId$index\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/image\" Target=\"media/page-$index.png\"/>"
             } + "</Relationships>"
 
     private fun visualContentTypesXml(): String =
-        "<?xml version=\\"1.0\\" encoding=\\"UTF-8\\" standalone=\\"yes\\"?>" +
-            "<Types xmlns=\\"http://schemas.openxmlformats.org/package/2006/content-types\\">" +
-            "<Default Extension=\\"rels\\" ContentType=\\"application/vnd.openxmlformats-package.relationships+xml\\"/>" +
-            "<Default Extension=\\"xml\\" ContentType=\\"application/xml\\"/>" +
-            "<Default Extension=\\"png\\" ContentType=\\"image/png\\"/>" +
-            "<Override PartName=\\"/word/document.xml\\" ContentType=\\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\\"/>" +
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
+            "<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">" +
+            "<Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/>" +
+            "<Default Extension=\"xml\" ContentType=\"application/xml\"/>" +
+            "<Default Extension=\"png\" ContentType=\"image/png\"/>" +
+            "<Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/>" +
             "</Types>"
 
     internal fun escapeXml(value: String): String = buildString(value.length) {
