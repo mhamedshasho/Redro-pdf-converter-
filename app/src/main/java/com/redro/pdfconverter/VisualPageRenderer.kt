@@ -26,6 +26,8 @@ class VisualPageRenderer(context: Context) {
     fun render(uri: Uri, targetWidth: Int = 1800): List<VisualPageImage> {
         require(targetWidth in 600..3000)
         val source = File.createTempFile("redro-render-", ".pdf", appContext.cacheDir)
+        val generatedFiles = ArrayList<File>()
+        var completed = false
         try {
             val input = appContext.contentResolver.openInputStream(uri)
                 ?: throw IllegalArgumentException("Unable to read selected PDF")
@@ -45,6 +47,7 @@ class VisualPageRenderer(context: Context) {
                             bitmap.eraseColor(Color.WHITE)
                             page.render(bitmap, null, Matrix().apply { setScale(scale, scale) }, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                             val imageFile = File.createTempFile("redro-page-${index + 1}-", ".png", appContext.cacheDir)
+                            generatedFiles += imageFile
                             try {
                                 FileOutputStream(imageFile).use { output ->
                                     check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output))
@@ -62,11 +65,13 @@ class VisualPageRenderer(context: Context) {
                             )
                         }
                     }
+                    completed = true
                     return pages
                 }
             }
         } finally {
             source.delete()
+            if (!completed) generatedFiles.forEach { it.delete() }
         }
     }
 }
