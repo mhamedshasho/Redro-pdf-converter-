@@ -1,53 +1,93 @@
 # Test Plan and Acceptance Criteria
 
 ## Test corpus
-Create and keep a small redistributable local test corpus with:
-- English PDF containing headings and multiple paragraphs.
-- Arabic PDF containing right-to-left paragraphs and punctuation.
+
+Maintain a small redistributable local corpus containing:
+- English PDF with headings and multiple paragraphs.
+- Arabic PDF with right-to-left paragraphs and punctuation.
 - Mixed Arabic/English PDF.
-- Multi-page PDF with page boundaries.
-- Selectable-text PDF with unusual spacing.
-- Image-only scanned PDF.
-- Empty PDF.
-- Corrupt/truncated PDF.
-- Encrypted/password-protected PDF.
+- Multi-page PDF with different page sizes or orientations.
+- Selectable-text PDF with unusual spacing and columns.
+- Image-only scanned Arabic PDF.
+- Image-only scanned English PDF.
+- Mixed page containing selectable text and scanned image regions.
+- Tables with and without visible borders.
+- PDF containing embedded images, diagrams, and charts.
+- PDF containing mathematical notation.
+- Empty, corrupt/truncated, and encrypted PDFs.
 - Large multi-page PDF for memory and responsiveness checks.
 
-Use generated fixtures or documents with permission to redistribute. Never commit private user documents.
+Use generated fixtures or documents with redistribution permission. Never commit private user documents.
 
-## Unit tests
-- Text normalization removes invalid control characters without joining unrelated words.
-- Empty lines and paragraph boundaries are deterministic.
-- Arabic text is detected and marked RTL.
-- English text remains LTR.
-- Mixed-script lines retain all characters.
-- Page order is retained.
-- DOCX ZIP contains [Content_Types].xml, _rels/.rels, and word/document.xml.
-- DOCX XML is well-formed and contains extracted text.
+## Foundation tests
+
+- Application compiles with the pinned Android Gradle Plugin and Gradle versions.
+- Unit test suite passes.
+- SAF picker returns a readable PDF URI.
+- PDF page count is read locally.
+- Invalid, encrypted, or unsupported PDFs show a useful error.
+- Manifest does not declare Internet permission.
+
+## PDF analysis tests
+
+- Page count and page dimensions are correct.
+- Text extraction retains Unicode and page order.
+- Positioned text retains coordinates and font metadata where available.
+- Embedded images are extracted without accidental duplication.
+- Image-only pages are classified as requiring OCR.
+- Mixed pages retain both native text and image regions.
+- Malformed input fails safely without an empty-success result.
+
+## OCR tests
+
+- Arabic, English, and mixed-language recognition.
+- Recognition accuracy measured against labelled ground truth.
+- Reading order and bounding boxes are retained.
+- Confidence values are surfaced for uncertain regions.
+- Rotation, skew, low contrast, and noisy scans are included.
+- OCR is executed locally in airplane mode.
+
+## DOCX tests
+
+- ZIP contains [Content_Types].xml, _rels/.rels, word/document.xml, and all referenced parts.
+- XML is well-formed and relationships resolve.
 - XML special characters are escaped.
-- Unicode Arabic and English survive write/read round-trip.
+- Arabic and English Unicode survive round-trip.
+- RTL paragraphs and mixed-script runs are represented correctly.
+- Images and table relationships resolve.
+- Page count/order is retained.
+- Generated DOCX opens in Microsoft Word or a compatible office application.
 
-## Instrumentation tests
-- PDF can be selected using the system document picker.
-- Output destination can be selected.
-- Successful conversion produces a readable DOCX.
-- Unsupported or empty input shows a useful error.
-- Cancellation does not leave a partial output.
-- Rotation/backgrounding does not corrupt conversion state.
+## Output-mode tests
 
-## Manual device tests
-- Open DOCX in a compatible Android office app.
-- Confirm Arabic paragraphs are RTL/right-aligned where supported.
-- Confirm English paragraphs remain LTR.
-- Inspect punctuation, numbers, and mixed Arabic/English strings.
-- Test multi-page and large files on a physical phone.
-- Verify airplane-mode conversion after dependencies are installed.
-- Confirm no PDF content is uploaded or transmitted.
+- Editable mode produces native editable text and tables where supported.
+- Visual mode includes every source page in order at the selected render resolution.
+- Visual mode preserves page aspect ratio and orientation.
+- Hybrid fallback does not omit unrecognized regions.
+- No mode reports success when output validation fails.
+
+## Performance and reliability
+
+- Large PDFs do not cause unbounded bitmap retention.
+- Conversion cancellation removes incomplete temporary output.
+- App backgrounding does not corrupt conversion state.
+- Low-storage conditions produce a clear error.
+- Airplane-mode operation succeeds after dependencies are installed.
+- No document contents are transmitted.
+
+## Manual device verification
+
+- Open output DOCX in a compatible Android office app.
+- Inspect Arabic RTL, English LTR, punctuation, numbers, and mixed-script lines.
+- Compare tables, images, and page layouts against source.
+- Test on a physical Android device and record model, Android version, file size, page count, duration, and observed memory behavior.
 
 ## Acceptance gates
-A test is not passed merely because a workflow file exists. Record actual command output and CI run results. APK distribution is blocked until automated checks pass and manual output inspection is recorded.
+
+A workflow file existing is not evidence that tests passed. Record actual CI run results and manual inspection. APK distribution is blocked until all required gates pass.
 
 ## Expected outcomes
-- Image-only scanned PDFs report that no selectable text was found; they must not produce a blank DOCX reported as successful.
-- Encrypted PDFs return a clear password-required/unsupported error.
-- Layout-heavy PDFs may lose columns, tables, images, and exact positioning in the first release; this limitation must be visible to users.
+
+- Image-only pages must be routed to OCR; they must not silently produce a blank successful DOCX.
+- Encrypted PDFs require an accepted password or return a clear unsupported/password-required error. Password bypass is not supported.
+- When exact semantic reconstruction is unreliable, preserve the visual region as an image and report the fallback.
