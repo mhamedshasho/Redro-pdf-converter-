@@ -255,24 +255,27 @@ class MainActivity : Activity() {
         visualExportButton.isEnabled = false
         statusView.text = getString(R.string.visual_export_running)
         Thread {
+            var renderedPages = emptyList<VisualPageImage>()
             try {
-                val pages = VisualPageRenderer(applicationContext).render(sourceUri)
+                renderedPages = VisualPageRenderer(applicationContext).render(sourceUri)
                 val output = contentResolver.openOutputStream(uri)
                     ?: throw IllegalStateException("Unable to create output document")
-                output.use { stream -> DocxPackageWriter.writeVisual(pages, stream) }
+                output.use { stream -> DocxPackageWriter.writeVisual(renderedPages, stream) }
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     visualExportButton.isEnabled = true
-                    statusView.append("\n\n")
+                    statusView.append("\\n\\n")
                     statusView.append(getString(R.string.visual_export_complete))
                 }
             } catch (_: Exception) {
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     visualExportButton.isEnabled = true
-                    statusView.append("\n\n")
+                    statusView.append("\\n\\n")
                     statusView.append(getString(R.string.visual_export_failed))
                 }
+            } finally {
+                renderedPages.forEach { it.pngFile?.delete() }
             }
         }.start()
     }
