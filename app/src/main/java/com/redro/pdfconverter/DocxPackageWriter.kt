@@ -30,8 +30,8 @@ object DocxPackageWriter {
         require(pages.isNotEmpty()) { "PDF contains no pages" }
         val pageWidth = pages.first().widthPoints.coerceAtLeast(1f)
         val pageHeight = pages.first().heightPoints.coerceAtLeast(1f)
-        val maxWidth = 9_144_000L
-        val maxHeight = 12_801_600L
+        val maxWidth = (pageWidth * 12_700f).toLong().coerceAtLeast(1L)
+        val maxHeight = (pageHeight * 12_700f).toLong().coerceAtLeast(1L)
         ZipOutputStream(BufferedOutputStream(output)).use { zip ->
             addEntry(zip, "[Content_Types].xml", visualContentTypesXml())
             addEntry(zip, "_rels/.rels", packageRelationshipsXml())
