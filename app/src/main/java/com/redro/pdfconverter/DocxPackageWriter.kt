@@ -65,23 +65,23 @@ object DocxPackageWriter {
                 val scale = minOf(maxWidth.toDouble() / page.widthPoints.coerceAtLeast(1f), maxHeight.toDouble() / page.heightPoints.coerceAtLeast(1f))
                 val imageWidth = (page.widthPoints * scale).toLong().coerceAtLeast(1L)
                 val imageHeight = (page.heightPoints * scale).toLong().coerceAtLeast(1L)
-                if (index > 0) append("<w:p><w:r><w:br w:type=\\"page\\"/></w:r></w:p>")
-                append("<w:p><w:pPr><w:jc w:val=\\"center\\"/></w:pPr><w:r><w:drawing>")
-                append("<wp:inline distT=\\"0\\" distB=\\"0\\" distL=\\"0\\" distR=\\"0\\">")
-                append("<wp:extent cx=\\"$imageWidth\\" cy=\\"$imageHeight\\"/>")
-                append("<wp:docPr id=\\"${index + 1}\\" name=\\"PDF page ${page.pageNumber}\\"/>")
-                append("<a:graphic xmlns:a=\\"http://schemas.openxmlformats.org/drawingml/2006/main\\">")
-                append("<a:graphicData uri=\\"http://schemas.openxmlformats.org/drawingml/2006/picture\\">")
-                append("<pic:pic xmlns:pic=\\"http://schemas.openxmlformats.org/drawingml/2006/picture\\">")
-                append("<pic:nvPicPr><pic:cNvPr id=\\"0\\" name=\\"page-${page.pageNumber}.png\\"/><pic:cNvPicPr/></pic:nvPicPr>")
-                append("<pic:blipFill><a:blip r:embed=\\"rId${index + 1}\\"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>")
-                append("<pic:spPr><a:xfrm><a:off x=\\"0\\" y=\\"0\\"/><a:ext cx=\\"$imageWidth\\" cy=\\"$imageHeight\\"/></a:xfrm><a:prstGeom prst=\\"rect\\"><a:avLst/></a:prstGeom></pic:spPr>")
+                if (index > 0) append("<w:p><w:r><w:br w:type=\"page\"/></w:r></w:p>")
+                append("<w:p><w:pPr><w:jc w:val=\"center\"/></w:pPr><w:r><w:drawing>")
+                append("<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">")
+                append("<wp:extent cx=\"$imageWidth\" cy=\"$imageHeight\"/>")
+                append("<wp:docPr id=\"${index + 1}\" name=\"PDF page ${page.pageNumber}\"/>")
+                append("<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">")
+                append("<a:graphicData uri=\"http://schemas.openxmlformats.org/drawingml/2006/picture\">")
+                append("<pic:pic xmlns:pic=\"http://schemas.openxmlformats.org/drawingml/2006/picture\">")
+                append("<pic:nvPicPr><pic:cNvPr id=\"0\" name=\"page-${page.pageNumber}.png\"/><pic:cNvPicPr/></pic:nvPicPr>")
+                append("<pic:blipFill><a:blip r:embed=\"rId${index + 1}\"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>")
+                append("<pic:spPr><a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"$imageWidth\" cy=\"$imageHeight\"/></a:xfrm><a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom></pic:spPr>")
                 append("</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>")
             }
-            append("<w:sectPr><w:pgSz w:w=\\"$pageWidthTwips\\" w:h=\\"$pageHeightTwips\\"/><w:pgMar w:top=\\"0\\" w:right=\\"0\\" w:bottom=\\"0\\" w:left=\\"0\\" w:header=\\"0\\" w:footer=\\"0\\" w:gutter=\\"0\\"/></w:sectPr>")
+            append("<w:sectPr><w:pgSz w:w=\"$pageWidthTwips\" w:h=\"$pageHeightTwips\"/><w:pgMar w:top=\"0\" w:right=\"0\" w:bottom=\"0\" w:left=\"0\" w:header=\"0\" w:footer=\"0\" w:gutter=\"0\"/></w:sectPr>")
         }
-        return "<?xml version=\\"1.0\\" encoding=\\"UTF-8\\" standalone=\\"yes\\"?>" +
-            "<w:document xmlns:w=\\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\\" xmlns:r=\\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\\" xmlns:wp=\\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\\"><w:body>$body</w:body></w:document>"
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
+            "<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\"><w:body>$body</w:body></w:document>"
     }
 
     private fun visualRelationshipsXml(count: Int): String =
