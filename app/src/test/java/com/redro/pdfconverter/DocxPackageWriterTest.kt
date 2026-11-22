@@ -35,6 +35,7 @@ class DocxPackageWriterTest {
             )
 
             DocxPackageWriter.writeEditable(analysis, output)
+            DocxPackageValidator.validate(output)
 
             ZipFile(output).use { zip ->
                 assertTrue(zip.getEntry("[Content_Types].xml") != null)
