@@ -18,6 +18,7 @@ class MainActivity : Activity() {
     private lateinit var chooseButton: Button
     private lateinit var exportButton: Button
     private lateinit var visualExportButton: Button
+    private lateinit var ocrDownloadButton: Button
     private var latestAnalysis: PdfAnalysisResult? = null
     private var latestPdfUri: Uri? = null
 
@@ -56,6 +57,12 @@ class MainActivity : Activity() {
             setOnClickListener { createDocx() }
         }
 
+        ocrDownloadButton = Button(this).apply {
+            text = getString(R.string.download_ocr_models)
+            visibility = View.GONE
+            setOnClickListener { downloadOcrModels() }
+        }
+
         visualExportButton = Button(this).apply {
             text = getString(R.string.export_visual_docx)
             visibility = View.GONE
@@ -76,6 +83,7 @@ class MainActivity : Activity() {
         root.addView(title, matchWrap())
         root.addView(subtitle, margins(matchWrap(), 12, 8, 12, 24))
         root.addView(chooseButton, margins(matchWrap(), 0, 8, 0, 8))
+        root.addView(ocrDownloadButton, margins(matchWrap(), 0, 8, 0, 8))
         root.addView(exportButton, margins(matchWrap(), 0, 8, 0, 8))
         root.addView(visualExportButton, margins(matchWrap(), 0, 0, 0, 16))
         root.addView(
@@ -170,6 +178,7 @@ class MainActivity : Activity() {
                     chooseButton.isEnabled = true
                     exportButton.visibility = if (result.pages.any { it.text.isNotBlank() }) View.VISIBLE else View.GONE
                     visualExportButton.visibility = View.VISIBLE
+                    ocrDownloadButton.visibility = if (result.pages.any { it.text.isBlank() } && !OcrLanguageModelManager.isReady(applicationContext)) View.VISIBLE else View.GONE
                     val output = StringBuilder()
                     output.append(getString(R.string.analysis_complete, result.pageCount))
                     output.append("\n\n")
@@ -212,6 +221,30 @@ class MainActivity : Activity() {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     chooseButton.isEnabled = true
                     statusView.text = getString(R.string.open_failed)
+                }
+            }
+        }.start()
+    }
+
+    private fun downloadOcrModels() {
+        ocrDownloadButton.isEnabled = false
+        statusView.text = getString(R.string.ocr_download_running)
+        Thread {
+            try {
+                OcrLanguageModelManager.downloadAll(applicationContext) { progress ->
+                    runOnUiThread { if (!isFinishing && !isDestroyed) statusView.text = progress }
+                }
+                runOnUiThread {
+                    if (isFinishing || isDestroyed) return@runOnUiThread
+                    ocrDownloadButton.isEnabled = true
+                    ocrDownloadButton.visibility = View.GONE
+                    statusView.text = getString(R.string.ocr_download_complete)
+                }
+            } catch (_: Exception) {
+                runOnUiThread {
+                    if (isFinishing || isDestroyed) return@runOnUiThread
+                    ocrDownloadButton.isEnabled = true
+                    statusView.text = getString(R.string.ocr_download_failed)
                 }
             }
         }.start()
