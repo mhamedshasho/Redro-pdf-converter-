@@ -4,6 +4,11 @@
     <string name="screen_title">Redro PDF Converter</string>
     <string name="screen_subtitle">تحليل ملفات PDF محلياً دون إنترنت</string>
     <string name="choose_pdf">اختيار ملف PDF</string>
+    <string name="export_editable_docx">تصدير Word قابل للتحرير</string>
+    <string name="export_running">جارٍ إنشاء ملف Word…</string>
+    <string name="export_complete">تم إنشاء ملف Word وحفظه.</string>
+    <string name="export_failed">فشل إنشاء ملف Word.</string>
+    <string name="export_cancelled">تم إلغاء التصدير.</string>
     <string name="waiting_for_file">اختر ملف PDF لفحص محتوياته على هذا الجهاز.</string>
     <string name="analysis_running">جارٍ تحليل ملف PDF محلياً…</string>
     <string name="analysis_complete">اكتمل التحليل · %1$d صفحات</string>
