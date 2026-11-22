@@ -3,15 +3,22 @@ package com.redro.pdfconverter
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.OutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 object DocxPackageWriter {
     fun writeEditable(analysis: PdfAnalysisResult, output: File) {
-        require(analysis.pages.isNotEmpty()) { "PDF contains no pages" }
         output.parentFile?.mkdirs()
+        FileOutputStream(output).use { stream ->
+            writeEditable(analysis, stream)
+        }
+    }
 
-        ZipOutputStream(BufferedOutputStream(FileOutputStream(output))).use { zip ->
+    fun writeEditable(analysis: PdfAnalysisResult, output: OutputStream) {
+        require(analysis.pages.isNotEmpty()) { "PDF contains no pages" }
+
+        ZipOutputStream(BufferedOutputStream(output)).use { zip ->
             addEntry(zip, "[Content_Types].xml", contentTypesXml())
             addEntry(zip, "_rels/.rels", packageRelationshipsXml())
             addEntry(zip, "word/document.xml", documentXml(analysis))
