@@ -113,6 +113,9 @@ object DocxPackageWriter {
         value.any { it.code in 0x0600..0x06FF || it.code in 0x0750..0x077F || it.code in 0x08A0..0x08FF }
 
     private fun documentXml(analysis: PdfAnalysisResult): String {
+        val firstPage = analysis.pages.first()
+        val pageWidthTwips = (firstPage.widthPoints * 20f).toInt().coerceAtLeast(1)
+        val pageHeightTwips = (firstPage.heightPoints * 20f).toInt().coerceAtLeast(1)
         val body = buildString {
             analysis.pages.forEachIndexed { pageIndex, page ->
                 if (pageIndex > 0) {
