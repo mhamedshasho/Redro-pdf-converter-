@@ -67,11 +67,10 @@ object DocxPackageValidator {
     private fun parse(bytes: ByteArray): org.w3c.dom.Document {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
-            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
-            setFeature("http://xml.org/sax/features/external-general-entities", false)
-            setFeature("http://xml.org/sax/features/external-parameter-entities", false)
-            setAttribute("http://javax.xml.XMLConstants/property/accessExternalDTD", "")
-            setAttribute("http://javax.xml.XMLConstants/property/accessExternalSchema", "")
+            try { setFeature("http://apache.org/xml/features/disallow-doctype-decl", true) } catch (_: Exception) { }
+            try { setFeature("http://xml.org/sax/features/external-general-entities", false) } catch (_: Exception) { }
+            try { setFeature("http://xml.org/sax/features/external-parameter-entities", false) } catch (_: Exception) { }
+            isExpandEntityReferences = false
         }
         return factory.newDocumentBuilder().parse(bytes.inputStream())
     }
