@@ -29,6 +29,7 @@ Never commit private user documents.
 ## OCR validation
 
 - Download English and Arabic language models on a real Android device.
+- Mixed text/image pages are sent through OCR and additional words are merged without repeating already extracted tokens.
 - Confirm model files are stored in app-private storage.
 - Enable airplane mode after model download and run OCR.
 - Compare OCR text against labelled ground truth for Arabic, English, and mixed content.
