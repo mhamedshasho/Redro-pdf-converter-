@@ -1,93 +1,73 @@
 # Test Plan and Acceptance Criteria
 
-## Test corpus
+## Automated foundation tests
 
-Maintain a small redistributable local corpus containing:
-- English PDF with headings and multiple paragraphs.
-- Arabic PDF with right-to-left paragraphs and punctuation.
+- Android Gradle build succeeds.
+- Unit tests pass.
+- Editable DOCX ZIP entries and XML are valid.
+- Arabic RTL properties and XML escaping are present.
+- Visual DOCX includes page image entries and relationships.
+- Visual DOCX document and relationship XML parse successfully.
+- OCR engine dependency resolves and app compiles with native libraries.
+
+## PDF input corpus
+
+Prepare redistributable fixtures for:
+- English selectable-text PDF.
+- Arabic selectable-text PDF.
 - Mixed Arabic/English PDF.
-- Multi-page PDF with different page sizes or orientations.
-- Selectable-text PDF with unusual spacing and columns.
+- Multi-page PDF with portrait and landscape pages.
 - Image-only scanned Arabic PDF.
 - Image-only scanned English PDF.
-- Mixed page containing selectable text and scanned image regions.
-- Tables with and without visible borders.
-- PDF containing embedded images, diagrams, and charts.
-- PDF containing mathematical notation.
-- Empty, corrupt/truncated, and encrypted PDFs.
-- Large multi-page PDF for memory and responsiveness checks.
+- Mixed text and image PDF.
+- Tables, diagrams, and embedded images.
+- Corrupt, empty, and password-protected PDFs.
+- Large multi-page PDF.
 
-Use generated fixtures or documents with redistribution permission. Never commit private user documents.
+Never commit private user documents.
 
-## Foundation tests
+## OCR validation
 
-- Application compiles with the pinned Android Gradle Plugin and Gradle versions.
-- Unit test suite passes.
-- SAF picker returns a readable PDF URI.
-- PDF page count is read locally.
-- Invalid, encrypted, or unsupported PDFs show a useful error.
-- Manifest does not declare Internet permission.
+- Download English and Arabic language models on a real Android device.
+- Confirm model files are stored in app-private storage.
+- Enable airplane mode after model download and run OCR.
+- Compare OCR text against labelled ground truth for Arabic, English, and mixed content.
+- Record recognition accuracy, duration, and device model.
+- Test rotated, skewed, low-contrast, and noisy scans.
+- Confirm no PDF bytes are transmitted.
 
-## PDF analysis tests
+## Editable DOCX validation
 
-- Page count and page dimensions are correct.
-- Text extraction retains Unicode and page order.
-- Positioned text retains coordinates and font metadata where available.
-- Embedded images are extracted without accidental duplication.
-- Image-only pages are classified as requiring OCR.
-- Mixed pages retain both native text and image regions.
-- Malformed input fails safely without an empty-success result.
+- Extracted and OCR text is present in the correct page order.
+- Arabic paragraphs use RTL properties.
+- Mixed-script text and punctuation are manually inspected.
+- Output opens in Microsoft Word or LibreOffice.
+- Known limitations around layout, tables, and embedded images are recorded.
 
-## OCR tests
+## Visual DOCX validation
 
-- Arabic, English, and mixed-language recognition.
-- Recognition accuracy measured against labelled ground truth.
-- Reading order and bounding boxes are retained.
-- Confidence values are surfaced for uncertain regions.
-- Rotation, skew, low contrast, and noisy scans are included.
-- OCR is executed locally in airplane mode.
+- Every PDF page appears once and in order.
+- Page images retain source aspect ratio.
+- Portrait and landscape page cases are inspected.
+- Output opens in Microsoft Word or LibreOffice.
+- Large-file memory behavior is measured.
 
-## DOCX tests
+## Reliability and performance
 
-- ZIP contains [Content_Types].xml, _rels/.rels, word/document.xml, and all referenced parts.
-- XML is well-formed and relationships resolve.
-- XML special characters are escaped.
-- Arabic and English Unicode survive round-trip.
-- RTL paragraphs and mixed-script runs are represented correctly.
-- Images and table relationships resolve.
-- Page count/order is retained.
-- Generated DOCX opens in Microsoft Word or a compatible office application.
+- Corrupt and encrypted files show clear errors.
+- Cancellation does not leave a falsely successful DOCX.
+- Backgrounding the app does not corrupt output.
+- Large PDFs do not cause unbounded memory use.
+- Low storage and network failure during model download are handled.
+- No document contents are uploaded.
 
-## Output-mode tests
+## Release gates
 
-- Editable mode produces native editable text and tables where supported.
-- Visual mode includes every source page in order at the selected render resolution.
-- Visual mode preserves page aspect ratio and orientation.
-- Hybrid fallback does not omit unrecognized regions.
-- No mode reports success when output validation fails.
+- CI tests pass.
+- Debug APK builds and is uploaded as an artifact.
+- OCR works offline after models are downloaded.
+- Both output modes are manually inspected in a compatible office application.
+- Physical-device testing records Android version, device, PDF page count, file size, processing duration, and observed memory use.
+- Known limitations remain visible until their corresponding implementation and tests are complete.
 
-## Performance and reliability
-
-- Large PDFs do not cause unbounded bitmap retention.
-- Conversion cancellation removes incomplete temporary output.
-- App backgrounding does not corrupt conversion state.
-- Low-storage conditions produce a clear error.
-- Airplane-mode operation succeeds after dependencies are installed.
-- No document contents are transmitted.
-
-## Manual device verification
-
-- Open output DOCX in a compatible Android office app.
-- Inspect Arabic RTL, English LTR, punctuation, numbers, and mixed-script lines.
-- Compare tables, images, and page layouts against source.
-- Test on a physical Android device and record model, Android version, file size, page count, duration, and observed memory behavior.
-
-## Acceptance gates
-
-A workflow file existing is not evidence that tests passed. Record actual CI run results and manual inspection. APK distribution is blocked until all required gates pass.
-
-## Expected outcomes
-
-- Image-only pages must be routed to OCR; they must not silently produce a blank successful DOCX.
-- Encrypted PDFs require an accepted password or return a clear unsupported/password-required error. Password bypass is not supported.
-- When exact semantic reconstruction is unreliable, preserve the visual region as an image and report the fallback.
+A successful CI build alone does not certify complete PDF-to-Word fidelity or production readiness.
