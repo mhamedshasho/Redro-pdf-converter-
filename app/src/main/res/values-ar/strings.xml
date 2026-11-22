@@ -2,10 +2,17 @@
 <resources>
     <string name="app_name">Redro PDF Converter</string>
     <string name="screen_title">Redro PDF Converter</string>
-    <string name="screen_subtitle">أساس قراءة وتحويل ملفات PDF دون إنترنت</string>
+    <string name="screen_subtitle">تحليل ملفات PDF محلياً دون إنترنت</string>
     <string name="choose_pdf">اختيار ملف PDF</string>
-    <string name="waiting_for_file">اختر ملف PDF لفحصه على هذا الجهاز.</string>
-    <string name="pdf_selected">تم فتح ملف PDF بنجاح. عدد الصفحات: %1$d</string>
-    <string name="open_failed">تعذّر فتح ملف PDF. قد يكون تالفاً أو محمياً أو غير مدعوم.</string>
+    <string name="waiting_for_file">اختر ملف PDF لفحص محتوياته على هذا الجهاز.</string>
+    <string name="analysis_running">جارٍ تحليل ملف PDF محلياً…</string>
+    <string name="analysis_complete">اكتمل التحليل · %1$d صفحات</string>
+    <string name="analysis_title">العنوان: %1$s</string>
+    <string name="analysis_page_text">الصفحة %1$d · %2$s · %3$.0f × %4$.0f نقطة</string>
+    <string name="analysis_text_bearing">تحتوي على نص قابل للاستخراج</string>
+    <string name="analysis_scanned">ممسوحة ضوئياً أو فارغة · تحتاج OCR</string>
+    <string name="analysis_preview">معاينة نص الصفحة الأولى</string>
+    <string name="analysis_no_text">لم يتم العثور على نص قابل للاستخراج في الصفحة الأولى.</string>
+    <string name="open_failed">تعذّر تحليل الملف. قد يكون تالفاً أو محمياً أو غير مدعوم.</string>
     <string name="no_file_selected">لم يتم اختيار ملف PDF.</string>
 </resources>
