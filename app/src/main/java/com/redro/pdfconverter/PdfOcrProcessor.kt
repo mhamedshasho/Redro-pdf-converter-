@@ -27,8 +27,10 @@ class PdfOcrProcessor(context: Context) {
             descriptor.use { pfd ->
                 PdfRenderer(pfd).use { renderer ->
                     val api = TessBaseAPI()
-                    check(api.init(OcrLanguageModelManager.dataPath(appContext), "ara+eng")) {
-                        "Unable to initialize Arabic and English OCR"
+                    val initialized = api.init(OcrLanguageModelManager.dataPath(appContext), "ara+eng")
+                    if (!initialized) {
+                        api.recycle()
+                        throw IllegalStateException("Unable to initialize Arabic and English OCR")
                     }
                     try {
                         val updatedPages = analysis.pages.mapIndexed { index, pageAnalysis ->
