@@ -34,7 +34,7 @@ class PdfOcrProcessor(context: Context) {
                     }
                     try {
                         val updatedPages = analysis.pages.mapIndexed { index, pageAnalysis ->
-                            if (pageAnalysis.text.isNotBlank()) {
+                            if (pageAnalysis.text.isNotBlank() && !pageAnalysis.hasImages) {
                                 pageAnalysis
                             } else {
                                 renderer.openPage(index).use { page ->
@@ -55,10 +55,11 @@ class PdfOcrProcessor(context: Context) {
                                         api.setImage(bitmap)
                                         val recognized = api.getUTF8Text().orEmpty().trim()
                                         api.clear()
-                                        if (recognized.isBlank()) pageAnalysis
+                                        val merged = mergeRecognizedText(pageAnalysis.text, recognized)
+                                        if (merged == pageAnalysis.text) pageAnalysis
                                         else pageAnalysis.copy(
-                                            text = recognized,
-                                            contentType = PdfPageContentType.TEXT_BEARING
+                                            text = merged,
+                                            contentType = PdfPageClassifier.classify(merged, pageAnalysis.hasImages)
                                         )
                                     } finally {
                                         bitmap.recycle()
@@ -75,5 +76,22 @@ class PdfOcrProcessor(context: Context) {
         } finally {
             source.delete()
         }
+    }
+
+    private fun mergeRecognizedText(extracted: String, recognized: String): String {
+        if (recognized.isBlank()) return extracted
+        val existing = extracted.lowercase()
+            .split(Regex("[^\\\\p{L}\\\\p{N}]+"))
+            .filter { it.isNotBlank() }
+            .toMutableSet()
+        val additions = recognized.lines().mapNotNull { line ->
+            val newWords = line.lowercase()
+                .split(Regex("[^\\\\p{L}\\\\p{N}]+"))
+                .filter { it.isNotBlank() && existing.add(it) }
+            newWords.takeIf { it.isNotEmpty() }?.joinToString(" ")
+        }
+        return if (additions.isEmpty()) extracted else listOf(extracted.trim(), additions.joinToString("\\n"))
+            .filter { it.isNotBlank() }
+            .joinToString("\\n")
     }
 }
