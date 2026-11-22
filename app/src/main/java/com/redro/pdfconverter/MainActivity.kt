@@ -12,6 +12,9 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 class MainActivity : Activity() {
     private lateinit var statusView: TextView
@@ -260,9 +263,16 @@ class MainActivity : Activity() {
             var renderedPages = emptyList<VisualPageImage>()
             try {
                 renderedPages = VisualPageRenderer(applicationContext).render(sourceUri)
-                val output = contentResolver.openOutputStream(uri)
-                    ?: throw IllegalStateException("Unable to create output document")
-                output.use { stream -> DocxPackageWriter.writeVisual(renderedPages, stream) }
+                val temporaryOutput = File.createTempFile("redro-visual-output-", ".docx", cacheDir)
+                try {
+                    FileOutputStream(temporaryOutput).use { stream ->
+                        DocxPackageWriter.writeVisual(renderedPages, stream)
+                    }
+                    DocxPackageValidator.validate(temporaryOutput)
+                    copyValidatedOutput(temporaryOutput, uri)
+                } finally {
+                    temporaryOutput.delete()
+                }
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     visualExportButton.isEnabled = true
@@ -303,10 +313,13 @@ class MainActivity : Activity() {
                 } else {
                     analysis
                 }
-                val output = contentResolver.openOutputStream(uri)
-                    ?: throw IllegalStateException("Unable to create output document")
-                output.use { stream ->
-                    DocxPackageWriter.writeEditable(converted, stream)
+                val temporaryOutput = File.createTempFile("redro-editable-output-", ".docx", cacheDir)
+                try {
+                    DocxPackageWriter.writeEditable(converted, temporaryOutput)
+                    DocxPackageValidator.validate(temporaryOutput)
+                    copyValidatedOutput(temporaryOutput, uri)
+                } finally {
+                    temporaryOutput.delete()
                 }
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
@@ -323,6 +336,15 @@ class MainActivity : Activity() {
                 }
             }
         }.start()
+    }
+
+
+    private fun copyValidatedOutput(source: File, destination: Uri) {
+        val output = contentResolver.openOutputStream(destination)
+            ?: throw IllegalStateException("Unable to create output document")
+        output.use { target ->
+            FileInputStream(source).use { input -> input.copyTo(target) }
+        }
     }
 
     private fun matchWrap(): LinearLayout.LayoutParams =
