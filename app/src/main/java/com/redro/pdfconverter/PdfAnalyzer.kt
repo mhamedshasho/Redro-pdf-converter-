@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import java.io.File
 import java.io.FileOutputStream
@@ -39,13 +40,18 @@ class PdfAnalyzer(context: Context) {
                         sortByPosition = true
                     }
                     val text = stripper.getText(document).trimEnd()
+                    val resources = page.resources
+                    val hasImages = resources != null && resources.xObjectNames.any { name ->
+                        resources.getXObject(name) is PDImageXObject
+                    }
 
                     pages += PdfPageAnalysis(
                         pageNumber = index + 1,
                         widthPoints = page.mediaBox.width,
                         heightPoints = page.mediaBox.height,
                         text = text,
-                        contentType = PdfPageClassifier.classify(text)
+                        contentType = PdfPageClassifier.classify(text, hasImages),
+                        hasImages = hasImages
                     )
                 }
 
