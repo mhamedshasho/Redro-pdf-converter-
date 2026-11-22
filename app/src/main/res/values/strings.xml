@@ -5,7 +5,14 @@
     <string name="screen_subtitle">Offline PDF inspection and conversion foundation</string>
     <string name="choose_pdf">Choose PDF</string>
     <string name="waiting_for_file">Choose a PDF file to inspect it on this device.</string>
-    <string name="pdf_selected">PDF opened successfully. Pages: %1$d</string>
-    <string name="open_failed">Could not open this PDF. The file may be damaged, encrypted, or unsupported.</string>
+    <string name="analysis_running">Analyzing PDF locally…</string>
+    <string name="analysis_complete">Analysis complete · %1$d pages</string>
+    <string name="analysis_title">Title: %1$s</string>
+    <string name="analysis_page_text">Page %1$d · %2$s · %3$.0f × %4$.0f pt</string>
+    <string name="analysis_text_bearing">Selectable text</string>
+    <string name="analysis_scanned">Scanned or empty · OCR required</string>
+    <string name="analysis_preview">First-page text preview</string>
+    <string name="analysis_no_text">No selectable text found on the first page.</string>
+    <string name="open_failed">Could not analyze this PDF. It may be damaged, encrypted, or unsupported.</string>
     <string name="no_file_selected">No PDF was selected.</string>
 </resources>
