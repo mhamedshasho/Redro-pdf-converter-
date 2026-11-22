@@ -19,7 +19,7 @@ Native Android PDF-to-Word converter with editable-text and visual-page output m
 - Editable DOCX package generation with XML escaping, page breaks, and basic Arabic RTL properties.
 - Visual DOCX export: renders each PDF page to a PNG and embeds the page images in a Word document.
 - Optional Tesseract 5 OCR engine with user-triggered downloads of Arabic and English tessdata_fast models.
-- OCR is run locally on pages where no selectable text was extracted.
+- OCR is run locally on pages without selectable text and supplements text on pages where direct PDF image XObjects are detected.
 - GitHub Actions unit tests, debug APK build, and APK artifact upload.
 
 ## Known limitations
