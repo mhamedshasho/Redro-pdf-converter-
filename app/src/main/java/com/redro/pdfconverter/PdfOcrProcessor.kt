@@ -81,12 +81,12 @@ class PdfOcrProcessor(context: Context) {
     private fun mergeRecognizedText(extracted: String, recognized: String): String {
         if (recognized.isBlank()) return extracted
         val existing = extracted.lowercase()
-            .split(Regex("[^\\\\p{L}\\\\p{N}]+"))
+            .split(Regex("[^\\p{L}\\p{N}]+"))
             .filter { it.isNotBlank() }
             .toMutableSet()
         val additions = recognized.lines().mapNotNull { line ->
             val newWords = line.lowercase()
-                .split(Regex("[^\\\\p{L}\\\\p{N}]+"))
+                .split(Regex("[^\\p{L}\\p{N}]+"))
                 .filter { it.isNotBlank() && existing.add(it) }
             newWords.takeIf { it.isNotEmpty() }?.joinToString(" ")
         }
