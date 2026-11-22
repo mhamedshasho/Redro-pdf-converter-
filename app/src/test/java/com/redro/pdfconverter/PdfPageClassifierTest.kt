@@ -35,4 +35,12 @@ class PdfPageClassifierTest {
             PdfPageClassifier.classify("")
         )
     }
+    @Test
+    fun classifiesTextWithImagesAsMixedContent() {
+        assertEquals(
+            PdfPageContentType.MIXED_CONTENT,
+            PdfPageClassifier.classify("Selectable text", true)
+        )
+    }
+
 }
