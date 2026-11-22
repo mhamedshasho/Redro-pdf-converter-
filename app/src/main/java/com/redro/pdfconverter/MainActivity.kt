@@ -178,7 +178,7 @@ class MainActivity : Activity() {
                     chooseButton.isEnabled = true
                     exportButton.visibility = View.VISIBLE
                     visualExportButton.visibility = View.VISIBLE
-                    ocrDownloadButton.visibility = if (result.pages.any { it.text.isBlank() } && !OcrLanguageModelManager.isReady(applicationContext)) View.VISIBLE else View.GONE
+                    ocrDownloadButton.visibility = if (result.pages.any { it.text.isBlank() || it.hasImages } && !OcrLanguageModelManager.isReady(applicationContext)) View.VISIBLE else View.GONE
                     val output = StringBuilder()
                     output.append(getString(R.string.analysis_complete, result.pageCount))
                     output.append("\n\n")
@@ -193,6 +193,8 @@ class MainActivity : Activity() {
                                 getString(R.string.analysis_text_bearing)
                             PdfPageContentType.SCANNED_OR_EMPTY ->
                                 getString(R.string.analysis_scanned)
+                            PdfPageContentType.MIXED_CONTENT ->
+                                getString(R.string.analysis_mixed)
                         }
                         output.append(
                             getString(
@@ -283,7 +285,7 @@ class MainActivity : Activity() {
     private fun saveDocx(uri: Uri) {
         val analysis = latestAnalysis ?: return
         val sourceUri = latestPdfUri ?: return
-        if (analysis.pages.any { it.text.isBlank() } && !OcrLanguageModelManager.isReady(applicationContext)) {
+        if (analysis.pages.any { it.text.isBlank() || it.hasImages } && !OcrLanguageModelManager.isReady(applicationContext)) {
             ocrDownloadButton.visibility = View.VISIBLE
             statusView.text = getString(R.string.ocr_required)
             return
@@ -293,7 +295,7 @@ class MainActivity : Activity() {
 
         Thread {
             try {
-                val converted = if (analysis.pages.any { it.text.isBlank() }) {
+                val converted = if (analysis.pages.any { it.text.isBlank() || it.hasImages }) {
                     runOnUiThread {
                         if (!isFinishing && !isDestroyed) statusView.text = getString(R.string.ocr_running)
                     }
