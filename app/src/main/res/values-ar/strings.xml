@@ -30,4 +30,5 @@
     <string name="ocr_download_failed">تعذّر تنزيل بيانات OCR. تحقق من الاتصال وحاول مجدداً.</string>
     <string name="ocr_required">نزّل بيانات OCR العربية والإنجليزية قبل تصدير الصفحات الممسوحة.</string>
     <string name="ocr_running">جارٍ التعرف على نص الصفحات المصوّرة محلياً…</string>
+    <string name="analysis_mixed">نص قابل للاستخراج مع صور · OCR تكميلي</string>
 </resources>
