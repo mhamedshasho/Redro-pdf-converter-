@@ -263,14 +263,14 @@ class MainActivity : Activity() {
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     visualExportButton.isEnabled = true
-                    statusView.append("\\n\\n")
+                    statusView.append("\n\n")
                     statusView.append(getString(R.string.visual_export_complete))
                 }
             } catch (_: Exception) {
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     visualExportButton.isEnabled = true
-                    statusView.append("\\n\\n")
+                    statusView.append("\n\n")
                     statusView.append(getString(R.string.visual_export_failed))
                 }
             }
@@ -306,14 +306,14 @@ class MainActivity : Activity() {
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     exportButton.isEnabled = true
-                    statusView.append("\\n\\n")
+                    statusView.append("\n\n")
                     statusView.append(getString(R.string.export_complete))
                 }
             } catch (_: Exception) {
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     exportButton.isEnabled = true
-                    statusView.append("\\n\\n")
+                    statusView.append("\n\n")
                     statusView.append(getString(R.string.export_failed))
                 }
             }
