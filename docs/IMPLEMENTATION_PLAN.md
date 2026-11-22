@@ -39,7 +39,7 @@
 **Status: Initial implementation**
 - Tesseract4Android 5 engine.
 - User-triggered download of official Arabic and English tessdata_fast models.
-- Local OCR for pages without extracted selectable text.
+- Local OCR for pages without extracted selectable text and supplemental OCR for pages with detected image XObjects.
 - Still required: real-device validation, labelled accuracy corpus, progress/cancellation, preprocessing, mixed-page OCR, and confidence reporting.
 
 ### M5 — Layout and complex content
