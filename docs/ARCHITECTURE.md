@@ -27,7 +27,7 @@
 - Tesseract 5 through Tesseract4Android.
 - Arabic and English tessdata_fast models are downloaded only after the user requests OCR setup.
 - Models are stored in app-private storage.
-- Scanned pages with no extracted text are rendered and recognized locally.
+- Scanned pages with no extracted text and pages containing direct image XObjects are rendered and recognized locally. OCR text is merged conservatively to reduce duplication.
 - The PDF document itself is never sent to the model host.
 
 ### Visual export
