@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
@@ -15,6 +16,8 @@ import android.widget.TextView
 class MainActivity : Activity() {
     private lateinit var statusView: TextView
     private lateinit var chooseButton: Button
+    private lateinit var exportButton: Button
+    private var latestAnalysis: PdfAnalysisResult? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +48,12 @@ class MainActivity : Activity() {
             setOnClickListener { openPdfPicker() }
         }
 
+        exportButton = Button(this).apply {
+            text = getString(R.string.export_editable_docx)
+            visibility = View.GONE
+            setOnClickListener { createDocx() }
+        }
+
         statusView = TextView(this).apply {
             text = getString(R.string.waiting_for_file)
             textSize = 15f
@@ -58,7 +67,8 @@ class MainActivity : Activity() {
 
         root.addView(title, matchWrap())
         root.addView(subtitle, margins(matchWrap(), 12, 8, 12, 24))
-        root.addView(chooseButton, margins(matchWrap(), 0, 8, 0, 16))
+        root.addView(chooseButton, margins(matchWrap(), 0, 8, 0, 8))
+        root.addView(exportButton, margins(matchWrap(), 0, 8, 0, 16))
         root.addView(
             scroll,
             LinearLayout.LayoutParams(
@@ -78,9 +88,29 @@ class MainActivity : Activity() {
         startActivityForResult(intent, REQUEST_OPEN_PDF)
     }
 
+    private fun createDocx() {
+        if (latestAnalysis == null) return
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = DOCX_MIME
+            putExtra(Intent.EXTRA_TITLE, "redro-converted.docx")
+        }
+        startActivityForResult(intent, REQUEST_CREATE_DOCX)
+    }
+
     @Deprecated("Deprecated by Android, retained for compatibility with the minimum SDK")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CREATE_DOCX) {
+            if (resultCode != RESULT_OK || data?.data == null) {
+                statusView.text = getString(R.string.export_cancelled)
+                return
+            }
+            saveDocx(data.data!!)
+            return
+        }
+
         if (requestCode != REQUEST_OPEN_PDF) return
         if (resultCode != RESULT_OK) {
             statusView.text = getString(R.string.no_file_selected)
@@ -97,6 +127,8 @@ class MainActivity : Activity() {
 
     private fun analyzePdf(uri: Uri) {
         chooseButton.isEnabled = false
+        exportButton.visibility = View.GONE
+        latestAnalysis = null
         statusView.text = getString(R.string.analysis_running)
 
         Thread {
@@ -104,7 +136,9 @@ class MainActivity : Activity() {
                 val result = PdfAnalyzer(applicationContext).analyze(uri)
                 runOnUiThread {
                     if (isFinishing || isDestroyed) return@runOnUiThread
+                    latestAnalysis = result
                     chooseButton.isEnabled = true
+                    exportButton.visibility = View.VISIBLE
                     val output = StringBuilder()
                     output.append(getString(R.string.analysis_complete, result.pageCount))
                     output.append("\n\n")
@@ -152,6 +186,35 @@ class MainActivity : Activity() {
         }.start()
     }
 
+    private fun saveDocx(uri: Uri) {
+        val analysis = latestAnalysis ?: return
+        exportButton.isEnabled = false
+        statusView.text = getString(R.string.export_running)
+
+        Thread {
+            try {
+                val output = contentResolver.openOutputStream(uri)
+                    ?: throw IllegalStateException("Unable to create output document")
+                output.use { stream ->
+                    DocxPackageWriter.writeEditable(analysis, stream)
+                }
+                runOnUiThread {
+                    if (isFinishing || isDestroyed) return@runOnUiThread
+                    exportButton.isEnabled = true
+                    statusView.append("\n\n")
+                    statusView.append(getString(R.string.export_complete))
+                }
+            } catch (_: Exception) {
+                runOnUiThread {
+                    if (isFinishing || isDestroyed) return@runOnUiThread
+                    exportButton.isEnabled = true
+                    statusView.append("\n\n")
+                    statusView.append(getString(R.string.export_failed))
+                }
+            }
+        }.start()
+    }
+
     private fun matchWrap(): LinearLayout.LayoutParams =
         LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -171,5 +234,7 @@ class MainActivity : Activity() {
 
     companion object {
         private const val REQUEST_OPEN_PDF = 4101
+        private const val REQUEST_CREATE_DOCX = 4102
+        private const val DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     }
 }
