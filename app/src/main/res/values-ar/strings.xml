@@ -24,4 +24,10 @@
     <string name="visual_export_running">جارٍ تحويل الصفحات إلى صور وإنشاء ملف Word…</string>
     <string name="visual_export_complete">تم إنشاء ملف Word المرئي وحفظه.</string>
     <string name="visual_export_failed">فشل التصدير المرئي. قد يكون الملف كبيراً جداً أو غير مدعوم.</string>
+    <string name="download_ocr_models">تنزيل بيانات OCR العربية والإنجليزية</string>
+    <string name="ocr_download_running">جارٍ تنزيل بيانات التعرف الضوئي…</string>
+    <string name="ocr_download_complete">أصبحت بيانات التعرف العربية والإنجليزية جاهزة. يمكنك الآن تحويل الصفحات الممسوحة إلى نص قابل للتحرير.</string>
+    <string name="ocr_download_failed">تعذّر تنزيل بيانات OCR. تحقق من الاتصال وحاول مجدداً.</string>
+    <string name="ocr_required">نزّل بيانات OCR العربية والإنجليزية قبل تصدير الصفحات الممسوحة.</string>
+    <string name="ocr_running">جارٍ التعرف على نص الصفحات المصوّرة محلياً…</string>
 </resources>
