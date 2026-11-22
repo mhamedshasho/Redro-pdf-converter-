@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Redro PDF Converter</string>
+    <string name="screen_title">Redro PDF Converter</string>
+    <string name="screen_subtitle">أساس قراءة وتحويل ملفات PDF دون إنترنت</string>
+    <string name="choose_pdf">اختيار ملف PDF</string>
+    <string name="waiting_for_file">اختر ملف PDF لفحصه على هذا الجهاز.</string>
+    <string name="pdf_selected">تم فتح ملف PDF بنجاح. عدد الصفحات: %1$d</string>
+    <string name="open_failed">تعذّر فتح ملف PDF. قد يكون تالفاً أو محمياً أو غير مدعوم.</string>
+    <string name="no_file_selected">لم يتم اختيار ملف PDF.</string>
+</resources>
