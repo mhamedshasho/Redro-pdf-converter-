@@ -3,8 +3,8 @@ package com.redro.pdfconverter
 import android.content.Context
 import android.net.Uri
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.text.PDFTextStripper
+import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.text.PDFTextStripper
 import java.io.File
 import java.io.FileOutputStream
 
