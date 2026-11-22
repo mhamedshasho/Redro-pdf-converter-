@@ -30,4 +30,5 @@
     <string name="ocr_download_failed">Could not download OCR data. Check your connection and try again.</string>
     <string name="ocr_required">Download Arabic and English OCR data before exporting scanned pages.</string>
     <string name="ocr_running">Recognizing scanned pages locally…</string>
+    <string name="analysis_mixed">Selectable text + images · OCR supplement</string>
 </resources>
