@@ -90,8 +90,12 @@ class PdfOcrProcessor(context: Context) {
                 .filter { it.isNotBlank() && existing.add(it) }
             newWords.takeIf { it.isNotEmpty() }?.joinToString(" ")
         }
-        return if (additions.isEmpty()) extracted else listOf(extracted.trim(), additions.joinToString("\\n"))
-            .filter { it.isNotBlank() }
-            .joinToString("\\n")
+        return if (additions.isEmpty()) extracted else buildString {
+            if (extracted.isNotBlank()) append(extracted.trim())
+            additions.forEach { line ->
+                if (isNotEmpty()) append(10.toChar())
+                append(line)
+            }
+        }
     }
 }
